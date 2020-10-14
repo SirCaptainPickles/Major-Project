@@ -6,6 +6,7 @@
 // 
 
 let cellSize;
+let hit = false;
 
 // Counters used to change between sprites, screens/gamestates, and locations
 let spriteTimer = 0;
@@ -21,6 +22,8 @@ let batsXPos = 400;
 let batsYPos = 200;
 
 let isMovingLeft, isMovingRight, isJumping;
+let batsYPositionOnGrid, batsXPositionOnGrid;
+
 
 // Player managment
 let hitboxScale = 9;
@@ -30,8 +33,8 @@ let spriteScale = 9;
 let isGrounded = false;
 let initialY;
 let jumpHeight = 70;
-let jumpSpeed = 8;
-let gravity = 1;
+let jumpSpeed = 1;
+let gravity = 5;
 let movementSpeed = 7;
 
 
@@ -70,6 +73,7 @@ function setup() {
 
 function draw() {
   background(220);
+  whereTheSpritesAre();
   displayLevel();
   displaySpriteBats();
   handleMovement();
@@ -83,6 +87,11 @@ function displaySpriteBats() {
 
 }
 
+function whereTheSpritesAre() {
+  batsYPositionOnGrid = floor(batsYPos / cellSize);
+  batsXPositionOnGrid = floor(batsXPos / cellSize);
+}
+
 function keyPressed() {
   if (key === "a") {
     isMovingLeft = true;
@@ -90,27 +99,29 @@ function keyPressed() {
   if (key === "d") {
     isMovingRight = true;
   }
-  if (keyCode === 32 && isGrounded) {
+  if (key === "w" && isGrounded) {
     initialY = batsYPos;
     isJumping = true;
   }
 }
 
 function handleMovement() {
-  
-  if (isMovingLeft) {
+
+  collisionDetection();
+
+  if (isMovingLeft && !hit) {
     batsXPos -= movementSpeed;
   }
-  if (isMovingRight) {
+
+  if (isMovingRight && !hit) {
     batsXPos += movementSpeed;
   }
-  if (isJumping) {
-    if (batsYPos >= initialY - jumpHeight) {
+  if (isJumping && currentLevel[batsYPositionOnGrid - 1][batsXPositionOnGrid] !== "+") {
+    while (batsYPos >= initialY - jumpHeight) {
       batsYPos -= jumpSpeed;
     }
-    else {
-      isJumping = false;
-    }
+    
+    isJumping = false;
   }
 }
 
@@ -121,18 +132,13 @@ function keyReleased() {
   if (key === "d") {
     isMovingRight = false;
   }
-  if (keyCode === 32) {
+  if (keyCode === "w") {
     isJumping = false;
   }
 }
 
 function applyGravity() {
   // Ground Detection
-  let batsYPositionOnGrid, batsXPositionOnGrid;
-
-  batsYPositionOnGrid = floor(batsYPos / cellSize);
-  batsXPositionOnGrid = floor(batsXPos / cellSize);
-
   if (currentLevel[batsYPositionOnGrid + 1][batsXPositionOnGrid] === "+") {
     isGrounded = true;
   }
@@ -143,7 +149,21 @@ function applyGravity() {
   if (!isGrounded && !isJumping) {
     batsYPos += gravity;
   }
+}
 
+function collisionDetection() {
+  for (let y=0; y < LEVELHEIGHT; y++) {
+    for (let x=0; x < LEVELWIDTH; x++) {
+      if (y !== batsYPositionOnGrid + 1) {
+        console.log("You're hitting something!");
+        hit = collideLineRect(batsXPos - 20, batsXPos + 20, x * cellSize, y * cellSize, cellSize, cellSize );
+      }
+      else {
+        console.log("All Clear!");
+        hit = false;
+      }
+    }
+  }
 }
 
 function displayLevel() {
