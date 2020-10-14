@@ -17,7 +17,8 @@ const LEVELWIDTH = 40;
 const LEVELHEIGHT = 20;
 
 let batsStanding, batsRight, batsLeft, batsJumping;
-let batsXPos, batsYPos;
+let batsXPos = 400;
+let batsYPos = 200;
 
 let isMovingLeft, isMovingRight, isJumping;
 
@@ -30,16 +31,16 @@ let isGrounded = false;
 let initialY;
 let jumpHeight = 70;
 let jumpSpeed = 8;
-let gravity = 5;
+let gravity = 1;
 let movementSpeed = 7;
 
 
 // Loads all Images
 function preload() {
-  batsStanding = loadImage('assets/characters/bats-standing.png');
-  batsRight = loadImage('assets/characters/bats-running-right.png');
-  batsLeft = loadImage('assets/characters/bats-running-left.png');
-  batsJumping = loadImage('assets/characters/bats-jumping.png');
+  batsStanding = loadImage("assets/characters/bats-standing.png");
+  batsRight = loadImage("assets/characters/bats-running-right.png");
+  batsLeft = loadImage("assets/characters/bats-running-left.png");
+  batsJumping = loadImage("assets/characters/bats-jumping.png");
 }
 
 function setup() {
@@ -70,6 +71,79 @@ function setup() {
 function draw() {
   background(220);
   displayLevel();
+  displaySpriteBats();
+  handleMovement();
+  applyGravity();
+}
+
+function displaySpriteBats() {
+
+  imageMode(CENTER);
+  image(batsStanding, batsXPos, batsYPos, height/spriteScale, height/spriteScale);
+
+}
+
+function keyPressed() {
+  if (key === "a") {
+    isMovingLeft = true;
+  }
+  if (key === "d") {
+    isMovingRight = true;
+  }
+  if (keyCode === 32 && isGrounded) {
+    initialY = batsYPos;
+    isJumping = true;
+  }
+}
+
+function handleMovement() {
+  
+  if (isMovingLeft) {
+    batsXPos -= movementSpeed;
+  }
+  if (isMovingRight) {
+    batsXPos += movementSpeed;
+  }
+  if (isJumping) {
+    if (batsYPos >= initialY - jumpHeight) {
+      batsYPos -= jumpSpeed;
+    }
+    else {
+      isJumping = false;
+    }
+  }
+}
+
+function keyReleased() {
+  if (key === "a") {
+    isMovingLeft = false;
+  }
+  if (key === "d") {
+    isMovingRight = false;
+  }
+  if (keyCode === 32) {
+    isJumping = false;
+  }
+}
+
+function applyGravity() {
+  // Ground Detection
+  let batsYPositionOnGrid, batsXPositionOnGrid;
+
+  batsYPositionOnGrid = floor(batsYPos / cellSize);
+  batsXPositionOnGrid = floor(batsXPos / cellSize);
+
+  if (currentLevel[batsYPositionOnGrid + 1][batsXPositionOnGrid] === "+") {
+    isGrounded = true;
+  }
+  else {
+    isGrounded = false;
+  }
+  
+  if (!isGrounded && !isJumping) {
+    batsYPos += gravity;
+  }
+
 }
 
 function displayLevel() {
@@ -97,109 +171,14 @@ function displayLevel() {
         }
 
       }
-
     }
   }   
 }
 
-// Makes a death screen. This should never show as I have not added a way to die.
-function deathScreen() {
-  clear();
-  background(0);
-  fill(255);
-  textSize(35);
-  text("Whoopsie, looks like you slipped up", width / 2, height / 2, width/4, height/2);
-}
-
-// Draws Sprite depending on which way you are moving or if you are standing still.
-function displaySpriteBats() {
-  push();
-  imageMode(CORNER);
-  if (isMovingLeft) {
-    if (spriteTimer <= 15) {
-      image(knightLeft1, spriteX, spriteY, height/spriteScale, height/spriteScale);
-      spriteTimer++;
-    }
-    else {
-      image(knightLeft2, spriteX, spriteY, height/spriteScale, height/spriteScale);
-      spriteTimer++;
-      if (spriteTimer === 30) {
-        spriteTimer = 0;
-      }
-    }
-  }
-  else if (isMovingRight) {
-    if (spriteTimer <= 15) {
-      image(knightRight1, spriteX, spriteY, height/spriteScale, height/spriteScale);
-      spriteTimer++;
-    }
-    else {
-      image(knightRight2, spriteX, spriteY, height/spriteScale, height/spriteScale);
-      spriteTimer++;
-      if (spriteTimer === 30) {
-        spriteTimer = 0;
-      }
-    }
-  }
-  else {
-    image(knightStill, spriteX, spriteY, height/spriteScale, height/spriteScale);
-  }
-  pop();
-}
-
-// Checks if sprite should be moving and then moves the sprite
-function handleMovement() {
-
-  if (isMovingLeft) {
-    spriteX -= movementSpeed;
-  }
-  if (isMovingRight) {
-    spriteX += movementSpeed;
-  }
-  if (isJumping) {
-    if (spriteY >= initialY - jumpHeight) {
-      spriteY -= jumpSpeed;
-    }
-    else {
-      isJumping = false;
-    }
-  }
-}
-
-// Sets movement variables to true based on key presses. The handleMovement function then uses these vairables for movement
-function keyPressed() {
-  if (key === "a") {
-    isMovingLeft = true;
-  }
-  if (key === "d") {
-    isMovingRight = true;
-  }
-  if (keyCode === 32 && isGrounded) {
-    initialY = spriteY;
-    isJumping = true;
-  }
-}
-
-// Sets movement variables to false based on key release. The handleMovement function then uses these vairables for movement
-function keyReleased() {
-  if (key === "a") {
-    isMovingLeft = false;
-  }
-  if (key === "d") {
-    isMovingRight = false;
-  }
-  if (keyCode === 32) {
-    isJumping = false;
-  }
-}
-
-// Applies gravity and checks if you are on the ground
-function applyGravity() {
-  // Ground Detection
-  isGrounded = collideLineRect(0 - 30, height * 0.63, width + 30, height * 0.63, spriteX, spriteY, height/hitboxScale, height/hitboxScale);
-  
-  if (!isGrounded && !isJumping) {
-    spriteY += gravity;
-  }
-
-}
+// function deathScreen() {
+//   clear();
+//   background(0);
+//   fill(255);
+//     textSize(35);
+//     text("Whoopsie, looks like you slipped up", width / 2, height / 2, width/4, height/2);
+// }
