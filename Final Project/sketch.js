@@ -27,7 +27,7 @@ let batsYPositionOnGrid, batsXPositionOnGrid;
 
 // Player managment
 let hitboxScale = 9;
-let spriteScale = 9;
+let spriteScale = 20;
 
 // Movement
 let isGrounded = false;
@@ -87,7 +87,7 @@ function draw() {
 function displaySpriteBats() {
 
   imageMode(CENTER);
-  image(batsStanding, batsXPos, batsYPos, height/spriteScale, height/spriteScale);
+  image(batsStanding, batsXPos, batsYPos, height/spriteScale, width/spriteScale);
 
 }
 
