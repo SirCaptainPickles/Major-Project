@@ -31,6 +31,10 @@ let spriteScale = 9;
 
 // Movement
 let isGrounded = false;
+let wallOnRight = false;
+let wallOnLeft = false;
+let ceilingAbove = false;
+
 let initialY;
 let jumpHeight = 70;
 let jumpSpeed = 1;
@@ -88,11 +92,12 @@ function displaySpriteBats() {
 }
 
 function whereTheSpritesAre() {
-  batsYPositionOnGrid = floor(batsYPos / cellSize);
-  batsXPositionOnGrid = floor(batsXPos / cellSize);
+  batsYPositionOnGrid = round(batsYPos / cellSize);
+  batsXPositionOnGrid = round(batsXPos / cellSize);
 }
 
 function keyPressed() {
+
   if (key === "a") {
     isMovingLeft = true;
   }
@@ -102,26 +107,6 @@ function keyPressed() {
   if (key === "w" && isGrounded) {
     initialY = batsYPos;
     isJumping = true;
-  }
-}
-
-function handleMovement() {
-
-  collisionDetection();
-
-  if (isMovingLeft && !hit) {
-    batsXPos -= movementSpeed;
-  }
-
-  if (isMovingRight && !hit) {
-    batsXPos += movementSpeed;
-  }
-  if (isJumping && currentLevel[batsYPositionOnGrid - 1][batsXPositionOnGrid] !== "+") {
-    while (batsYPos >= initialY - jumpHeight) {
-      batsYPos -= jumpSpeed;
-    }
-    
-    isJumping = false;
   }
 }
 
@@ -137,9 +122,37 @@ function keyReleased() {
   }
 }
 
+function handleMovement() {
+
+  collisionDetection();
+
+  if (isMovingLeft && !wallOnLeft) {
+    batsXPos -= movementSpeed;
+  }
+
+  if (isMovingRight && !wallOnRight) {
+    batsXPos += movementSpeed;
+  }
+
+  if (isJumping) {
+    for (let i = batsYPos; i >= initialY - jumpHeight; i -= jumpSpeed) {
+      batsYPos = i;
+    }
+    isJumping = false;
+  }
+
+  if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "!") {
+    levelFailedScreen();
+  }
+
+}
+
 function applyGravity() {
   // Ground Detection
-  if (currentLevel[batsYPositionOnGrid + 1][batsXPositionOnGrid] === "+") {
+  let tempBatsYPosOnGrid = ceil(batsYPos / cellSize);
+  let tempBatsXPosOnGrid = floor(batsXPos / cellSize);
+
+  if (currentLevel[tempBatsYPosOnGrid][tempBatsXPosOnGrid] === "+") {
     isGrounded = true;
   }
   else {
@@ -152,18 +165,30 @@ function applyGravity() {
 }
 
 function collisionDetection() {
-  for (let y=0; y < LEVELHEIGHT; y++) {
-    for (let x=0; x < LEVELWIDTH; x++) {
-      if (y !== batsYPositionOnGrid + 1) {
-        console.log("You're hitting something!");
-        hit = collideLineRect(batsXPos - 20, batsXPos + 20, x * cellSize, y * cellSize, cellSize, cellSize );
-      }
-      else {
-        console.log("All Clear!");
-        hit = false;
-      }
-    }
+  if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid - 1] === "+") {
+    wallOnLeft = true;
   }
+  else {
+    wallOnLeft = false;
+  }
+
+  if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid + 1] === "+") {
+    wallOnRight = true;
+  }
+  else {
+    wallOnRight = false;
+  }
+
+  if (currentLevel[batsYPositionOnGrid - 1][batsXPositionOnGrid] === "+") {
+    ceilingAbove = true;
+  }
+  else {
+    ceilingAbove = false;
+  }
+}
+
+function levelFailedScreen() {
+
 }
 
 function displayLevel() {
