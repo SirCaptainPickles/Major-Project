@@ -16,6 +16,8 @@ let areaCounter = 0; // Does nothing in this version
 let currentLevel = [];
 const LEVELWIDTH = 40;
 const LEVELHEIGHT = 20;
+let hasKey = false;
+let levelCompleted = false;
 
 let batsStanding, batsRight, batsLeft, batsJumping;
 let batsXPos = 400;
@@ -44,6 +46,8 @@ let movementSpeed = 7;
 
 // Loads all Images
 function preload() {
+  currentLevel = loadStrings("assets/level1.txt");
+
   batsStanding = loadImage("assets/characters/bats-standing.png");
   batsRight = loadImage("assets/characters/bats-running-right.png");
   batsLeft = loadImage("assets/characters/bats-running-left.png");
@@ -66,22 +70,26 @@ function setup() {
   isMovingRight = false;
   isJumping = false;
 
-  currentLevel = loadStrings("assets/level1.txt");
-
   // convert currentLevel into 2d array
   for (let i=0; i<currentLevel.length; i++) {
-    currentLevel[i] = currentLevel[i].split(",");
+    currentLevel[i] = currentLevel[i].split(" ");
   }
 
 }
 
 function draw() {
   background(220);
+
   whereTheSpritesAre();
   displayLevel();
+
   displaySpriteBats();
   handleMovement();
   applyGravity();
+}
+
+function mousePressed() {
+  console.log(currentLevel);
 }
 
 function displaySpriteBats() {
@@ -104,7 +112,6 @@ function displaySpriteBats() {
 function whereTheSpritesAre() {
   batsYPositionOnGrid = round(batsYPos / cellSize);
   batsXPositionOnGrid = round(batsXPos / cellSize);
-  console.log(batsXPositionOnGrid, batsYPositionOnGrid);
 }
 
 function keyPressed() {
@@ -185,6 +192,7 @@ function applyGravity() {
 }
 
 function collisionDetection() {
+  //Wall and ceilling check
   if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid - 1] === "+") {
     wallOnLeft = true;
   }
@@ -205,6 +213,22 @@ function collisionDetection() {
   else {
     ceilingAbove = false;
   }
+
+  //Key and door check
+  if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "*") {
+    console.log("Key collected");
+    hasKey = true;
+    currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] = "0";
+  }
+
+  if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "?" && hasKey) {
+    levelCompleted = true;
+    levelPassed();
+  }
+}
+
+function levelPassed() {
+
 }
 
 function levelFailedScreen() {
@@ -232,6 +256,12 @@ function displayLevel() {
         if (currentLevel[y][x] === "!") {
           //Danger
           fill("red");
+          rect(x * cellSize, y * cellSize, cellSize, cellSize);
+        }
+
+        if (currentLevel[y][x] === "*") {
+          //Key
+          fill("yellow");
           rect(x * cellSize, y * cellSize, cellSize, cellSize);
         }
 
