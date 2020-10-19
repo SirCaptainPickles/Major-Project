@@ -86,7 +86,19 @@ function draw() {
 
 function displaySpriteBats() {
   imageMode(CENTER);
-  image(batsStanding, batsXPos, batsYPos, batsStanding.width, batsStanding.height);
+
+  if (isJumping) {
+    image(batsJumping, batsXPos, batsYPos, batsJumping.width, batsJumping.height);
+  }
+  else if (isMovingLeft) {
+    image(batsLeft, batsXPos, batsYPos, batsLeft.width, batsLeft.height);
+  }
+  else if (isMovingRight) {
+    image(batsRight, batsXPos, batsYPos, batsRight.width, batsRight.height);
+  }
+  else {
+    image(batsStanding, batsXPos, batsYPos, batsStanding.width, batsStanding.height);
+  }
 }
 
 function whereTheSpritesAre() {
