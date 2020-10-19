@@ -27,7 +27,7 @@ let batsYPositionOnGrid, batsXPositionOnGrid;
 
 // Player managment
 let hitboxScale = 20;
-let spriteScale = 25;
+let spriteScale = 0;
 
 // Movement
 let isGrounded = false;
@@ -85,16 +85,14 @@ function draw() {
 }
 
 function displaySpriteBats() {
-
   imageMode(CENTER);
-  image(batsStanding, batsXPos, batsYPos, height/spriteScale, width/spriteScale);
-
+  image(batsStanding, batsXPos, batsYPos, batsStanding.width, batsStanding.height);
 }
 
 function whereTheSpritesAre() {
   batsYPositionOnGrid = round(batsYPos / cellSize);
   batsXPositionOnGrid = round(batsXPos / cellSize);
-  console.log(batsXPositionOnGrid);
+  console.log(batsXPositionOnGrid, batsYPositionOnGrid);
 }
 
 function keyPressed() {
@@ -159,7 +157,7 @@ function handleMovement() {
 
 function applyGravity() {
   // Ground Detection
-  let tempBatsYPosOnGrid = ceil(batsYPos / cellSize);
+  let tempBatsYPosOnGrid = round((batsYPos + 5) / cellSize);
   let tempBatsXPosOnGrid = floor(batsXPos / cellSize);
 
   if (currentLevel[tempBatsYPosOnGrid][tempBatsXPosOnGrid] === "+") {
