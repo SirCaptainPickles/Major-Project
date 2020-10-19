@@ -26,8 +26,8 @@ let batsYPositionOnGrid, batsXPositionOnGrid;
 
 
 // Player managment
-let hitboxScale = 9;
-let spriteScale = 20;
+let hitboxScale = 20;
+let spriteScale = 25;
 
 // Movement
 let isGrounded = false;
@@ -36,8 +36,8 @@ let wallOnLeft = false;
 let ceilingAbove = false;
 
 let initialY;
-let jumpHeight = 70;
-let jumpSpeed = 1;
+let batsJumpHeight = 70;
+let jumpSpeed = 5;
 let gravity = 5;
 let movementSpeed = 7;
 
@@ -94,6 +94,7 @@ function displaySpriteBats() {
 function whereTheSpritesAre() {
   batsYPositionOnGrid = round(batsYPos / cellSize);
   batsXPositionOnGrid = round(batsXPos / cellSize);
+  console.log(batsXPositionOnGrid);
 }
 
 function keyPressed() {
@@ -126,6 +127,13 @@ function handleMovement() {
 
   collisionDetection();
 
+  if (ceilingAbove) {
+    batsJumpHeight = 30;
+  }
+  else {
+    batsJumpHeight = 70;
+  }
+
   if (isMovingLeft && !wallOnLeft) {
     batsXPos -= movementSpeed;
   }
@@ -135,10 +143,12 @@ function handleMovement() {
   }
 
   if (isJumping) {
-    for (let i = batsYPos; i >= initialY - jumpHeight; i -= jumpSpeed) {
-      batsYPos = i;
+    if (batsYPos >= initialY - batsJumpHeight) {
+      batsYPos -= jumpSpeed;
     }
-    isJumping = false;
+    else {
+      isJumping = false;
+    }
   }
 
   if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "!") {
@@ -172,7 +182,7 @@ function collisionDetection() {
     wallOnLeft = false;
   }
 
-  if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid + 1] === "+") {
+  if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "+") {
     wallOnRight = true;
   }
   else {
