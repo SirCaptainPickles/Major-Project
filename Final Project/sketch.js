@@ -5,53 +5,77 @@
 // Extra for Experts:
 // 
 
-let cellSize;
-let hit = false;
-
-// Counters used to change between sprites, screens/gamestates, and locations
-let spriteTimer = 0;
+// Variable used to change between screens/gamestates, and locations
 let state = "start";
-let areaCounter = 0; // Does nothing in this version
 
+//Game setup Variables
 let currentLevel = [];
 const LEVELWIDTH = 40;
 const LEVELHEIGHT = 20;
+let cellSize;
+
 let hasKey = false;
 let levelCompleted = false;
+let hit = false;
 
+//Setting Sprite Position Variables
 let batsStanding, batsRight, batsLeft, batsJumping;
 let batsXPos = 400;
 let batsYPos = 200;
 
-let isMovingLeft, isMovingRight, isJumping;
+let wingsStanding, wingsRight, wingsLeft, wingsJumping;
+let wingsXPos = 410;
+let wingsYPos = 200;
+
+//Setting Sprite Movement Variables
+let batsIsMovingLeft = false;
+let batsIsMovingRight = false; 
+let batsIsJumping = false;
 let batsYPositionOnGrid, batsXPositionOnGrid;
 
+let wingsIsMovingLeft = false;
+let wingsIsMovingRight = false;
+let wingsIsJumping = false;
+let wingsYPositionOnGrid, wingsXPositionOnGrid;
 
-// Player managment
+
+// Sprite managment (Scaling and collision)
 let hitboxScale = 20;
 let spriteScale = 0;
 
-// Movement
-let isGrounded = false;
-let wallOnRight = false;
-let wallOnLeft = false;
-let ceilingAbove = false;
+// Sprite Movement Variables
+let batsIsGrounded = false;
+let wallOnBatsRight = false;
+let wallOnBatsLeft = false;
+let ceilingAboveBats = false;
 
-let initialY;
+let wingsIsGrounded = false;
+let wallOnWingsRight = false;
+let wallOnWingsLeft = false;
+let ceilingAboveWings = false;
+
+let batsInitialY, wingsInitialY;
+
 let batsJumpHeight = 70;
+let wingsJumpHeight = 100;
+
 let jumpSpeed = 5;
 let gravity = 5;
 let movementSpeed = 7;
 
 
-// Loads all Images
+// Loads all Images and first level
 function preload() {
   currentLevel = loadStrings("assets/level1.txt");
 
+  //Sprite Bats images
   batsStanding = loadImage("assets/characters/bats-standing.png");
   batsRight = loadImage("assets/characters/bats-running-right.png");
   batsLeft = loadImage("assets/characters/bats-running-left.png");
   batsJumping = loadImage("assets/characters/bats-jumping.png");
+
+  //Sprite Wings images
+
 }
 
 function setup() {
@@ -64,11 +88,7 @@ function setup() {
     cellSize = windowHeight / LEVELHEIGHT;
   }
 
-  imageMode(CENTER);
   frameRate(30);
-  isMovingLeft = false;
-  isMovingRight = false;
-  isJumping = false;
 
   // convert currentLevel into 2d array
   for (let i=0; i<currentLevel.length; i++) {
@@ -84,24 +104,26 @@ function draw() {
   displayLevel();
 
   displaySpriteBats();
+  displaySpriteWings();
+
   handleMovement();
   applyGravity();
 }
 
-function mousePressed() {
+function mousePressed() { //REMOVE AFTER DEBUGGING
   console.log(currentLevel);
 }
 
 function displaySpriteBats() {
   imageMode(CENTER);
 
-  if (isJumping) {
+  if (batsIsJumping) {
     image(batsJumping, batsXPos, batsYPos, batsJumping.width, batsJumping.height);
   }
-  else if (isMovingLeft) {
+  else if (batsIsMovingLeft) {
     image(batsLeft, batsXPos, batsYPos, batsLeft.width, batsLeft.height);
   }
-  else if (isMovingRight) {
+  else if (batsIsMovingRight) {
     image(batsRight, batsXPos, batsYPos, batsRight.width, batsRight.height);
   }
   else {
@@ -109,62 +131,91 @@ function displaySpriteBats() {
   }
 }
 
+function displaySpriteWings() {
+  imageMode(CENTER);
+}
+
 function whereTheSpritesAre() {
   batsYPositionOnGrid = round(batsYPos / cellSize);
   batsXPositionOnGrid = round(batsXPos / cellSize);
+
+  wingsYPositionOnGrid = round(wingsYPos / cellSize);
+  wingsXPositionOnGrid = round(wingsXPos / cellSize);
 }
 
 function keyPressed() {
 
   if (key === "a") {
-    isMovingLeft = true;
+    batsIsMovingLeft = true;
   }
   if (key === "d") {
-    isMovingRight = true;
+    batsIsMovingRight = true;
   }
-  if (key === "w" && isGrounded) {
-    initialY = batsYPos;
-    isJumping = true;
+  if (key === "w" && batsIsGrounded) {
+    batsInitialY = batsYPos;
+    batsIsJumping = true;
+  }
+
+  if (key === LEFT_ARROW) {
+    wingsIsMovingLeft = true;
+  }
+  if (key === RIGHT_ARROW) {
+    wingsIsMovingRight = true;
+  }
+  if (key === UP_ARROW) {
+    wingsInitialY = wingsYPos;
+    wingsIsJumping = true;
   }
 }
 
 function keyReleased() {
   if (key === "a") {
-    isMovingLeft = false;
+    batsIsMovingLeft = false;
   }
   if (key === "d") {
-    isMovingRight = false;
+    batsIsMovingRight = false;
   }
-  if (keyCode === "w") {
-    isJumping = false;
+  if (key === "w") {
+    batsIsJumping = false;
+  }
+
+  if (key === LEFT_ARROW) {
+    wingsIsMovingLeft = false;
+  }
+  if (key === RIGHT_ARROW) {
+    wingsIsMovingRight = false;
+  }
+  if (key === UP_ARROW) {
+    wingsIsJumping = false;
   }
 }
 
 function handleMovement() {
-
+  //Check for Collision before Moving
   collisionDetection();
 
-  if (ceilingAbove) {
+  //Sprite Bats movement
+  if (ceilingAboveBats) {
     batsJumpHeight = 30;
   }
   else {
     batsJumpHeight = 70;
   }
 
-  if (isMovingLeft && !wallOnLeft) {
+  if (batsIsMovingLeft && !wallOnBatsLeft) {
     batsXPos -= movementSpeed;
   }
 
-  if (isMovingRight && !wallOnRight) {
+  if (batsIsMovingRight && !wallOnBatsRight) {
     batsXPos += movementSpeed;
   }
 
-  if (isJumping) {
-    if (batsYPos >= initialY - batsJumpHeight) {
+  if (batsIsJumping) {
+    if (batsYPos >= batsInitialY - batsJumpHeight) {
       batsYPos -= jumpSpeed;
     }
     else {
-      isJumping = false;
+      batsIsJumping = false;
     }
   }
 
@@ -172,49 +223,121 @@ function handleMovement() {
     levelFailedScreen();
   }
 
+  //Sprite Wings Movement
+  if (ceilingAboveWings) {
+    wingsJumpHeight = 30;
+  }
+  else {
+    wingsJumpHeight = 100;
+  }
+
+  if (wingsIsMovingLeft && !wallOnBatsLeft) {
+    wingsXPos -= movementSpeed;
+  }
+
+  if (wingsIsMovingRight && !wallOnBatsRight) {
+    wingsXPos += movementSpeed;
+  }
+
+  if (wingsIsJumping) {
+    if (wingsYPos >= wingsInitialY - wingsJumpHeight) {
+      wingsYPos -= jumpSpeed;
+    }
+    else {
+      wingsIsJumping = false;
+    }
+  }
+
+  if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "!") {
+    levelFailedScreen();
+  }
 }
 
 function applyGravity() {
-  // Ground Detection
+  //Setting temporary variables to help with floor collision
   let tempBatsYPosOnGrid = round((batsYPos + 5) / cellSize);
   let tempBatsXPosOnGrid = floor(batsXPos / cellSize);
+  let tempWingsYPosOnGrid = round((wingsYPos + 5) / cellSize);
+  let tempWingsXPosOnGrid = floor(wingsXPos / cellSize);
 
+  // Ground Detection for Sprite Bats
   if (currentLevel[tempBatsYPosOnGrid][tempBatsXPosOnGrid] === "+") {
-    isGrounded = true;
+    batsIsGrounded = true;
   }
   else {
-    isGrounded = false;
+    batsIsGrounded = false;
   }
   
-  if (!isGrounded && !isJumping) {
+  //Apply gravity to Sprite Bats
+  if (!batsIsGrounded && !batsIsJumping) {
     batsYPos += gravity;
+  }
+  
+  //Ground Detection for Sprite Wings
+  if (currentLevel[tempWingsYPosOnGrid][tempWingsXPosOnGrid] === "+") {
+    wingsIsGrounded = true;
+  }
+  else {
+    wingsIsGrounded = false;
+  }
+  
+  //Apply Gravity to Sprite Wings
+  if (!wingsIsGrounded && !wingsIsJumping) {
+    wingsYPos += gravity;
   }
 }
 
 function collisionDetection() {
   //Wall and ceilling check
+
+  //Bats Sprite Collision
   if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid - 1] === "+") {
-    wallOnLeft = true;
+    wallOnBatsLeft = true;
   }
   else {
-    wallOnLeft = false;
+    wallOnBatsLeft = false;
   }
 
   if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "+") {
-    wallOnRight = true;
+    wallOnBatsRight = true;
   }
   else {
-    wallOnRight = false;
+    wallOnBatsRight = false;
   }
 
   if (currentLevel[batsYPositionOnGrid - 1][batsXPositionOnGrid] === "+") {
-    ceilingAbove = true;
+    ceilingAboveBats = true;
   }
   else {
-    ceilingAbove = false;
+    ceilingAboveBats = false;
   }
 
+  //Wings Sprite Collision
+  if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid - 1] === "+") {
+    wallOnWingsLeft = true;
+  }
+  else {
+    wallOnWingsLeft = false;
+  }
+
+  if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "+") {
+    wallOnWingsRight = true;
+  }
+  else {
+    wallOnWingsRight = false;
+  }
+
+  if (currentLevel[wingsYPositionOnGrid - 1][wingsXPositionOnGrid] === "+") {
+    ceilingAboveWings = true;
+  }
+  else {
+    ceilingAboveWings = false;
+  }
+
+  
   //Key and door check
+
+  //Bats Sprite Collision
   if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "*") {
     console.log("Key collected");
     hasKey = true;
@@ -222,6 +345,18 @@ function collisionDetection() {
   }
 
   if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "?" && hasKey) {
+    levelCompleted = true;
+    levelPassed();
+  }
+
+  //Wings Sprite Collision
+  if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "*") {
+    console.log("Key collected");
+    hasKey = true;
+    currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] = "0";
+  }
+
+  if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "?" && hasKey) {
     levelCompleted = true;
     levelPassed();
   }
