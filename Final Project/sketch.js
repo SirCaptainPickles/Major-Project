@@ -41,7 +41,7 @@ let wingsYPositionOnGrid, wingsXPositionOnGrid;
 
 // Sprite managment (Scaling and collision)
 let hitboxScale = 20;
-let spriteScale = 0;
+let spriteScale = 1.4;
 
 // Sprite Movement Variables
 let batsIsGrounded = false;
@@ -75,7 +75,10 @@ function preload() {
   batsJumping = loadImage("assets/characters/bats-jumping.png");
 
   //Sprite Wings images
-
+  wingsStanding = loadImage("assets/characters/wings-standing.png");
+  wingsRight = loadImage("assets/characters/wings-running-right.png");
+  wingsLeft = loadImage("assets/characters/wings-running-left.png");
+  wingsJumping = loadImage("assets/characters/wings-jumping.png");
 }
 
 function setup() {
@@ -133,6 +136,19 @@ function displaySpriteBats() {
 
 function displaySpriteWings() {
   imageMode(CENTER);
+
+  if (wingsIsJumping) {
+    image(wingsJumping, wingsXPos, wingsYPos, wingsJumping.width, wingsJumping.height);
+  }
+  else if (wingsIsMovingLeft) {
+    image(wingsLeft, wingsXPos, wingsYPos, wingsLeft.width, wingsLeft.height);
+  }
+  else if (wingsIsMovingRight) {
+    image(wingsRight, wingsXPos, wingsYPos, wingsRight.width, wingsRight.height);
+  }
+  else {
+    image(wingsStanding, wingsXPos, wingsYPos, wingsStanding.width * spriteScale, wingsStanding.height * spriteScale);
+  }
 }
 
 function whereTheSpritesAre() {
@@ -156,13 +172,13 @@ function keyPressed() {
     batsIsJumping = true;
   }
 
-  if (key === LEFT_ARROW) {
+  if (keyCode === LEFT_ARROW) {
     wingsIsMovingLeft = true;
   }
-  if (key === RIGHT_ARROW) {
+  if (keyCode === RIGHT_ARROW) {
     wingsIsMovingRight = true;
   }
-  if (key === UP_ARROW) {
+  if (keyCode === UP_ARROW) {
     wingsInitialY = wingsYPos;
     wingsIsJumping = true;
   }
@@ -179,13 +195,13 @@ function keyReleased() {
     batsIsJumping = false;
   }
 
-  if (key === LEFT_ARROW) {
+  if (keyCode === LEFT_ARROW) {
     wingsIsMovingLeft = false;
   }
-  if (key === RIGHT_ARROW) {
+  if (keyCode === RIGHT_ARROW) {
     wingsIsMovingRight = false;
   }
-  if (key === UP_ARROW) {
+  if (keyCode === UP_ARROW) {
     wingsIsJumping = false;
   }
 }
