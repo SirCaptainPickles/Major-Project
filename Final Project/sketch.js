@@ -6,7 +6,7 @@
 // 
 
 // Variable used to change between screens/gamestates, and locations
-let state = "start";
+let state = "start menu";
 
 //Game setup Variables
 let currentLevel = [];
@@ -138,13 +138,13 @@ function displaySpriteWings() {
   imageMode(CENTER);
 
   if (wingsIsJumping) {
-    image(wingsJumping, wingsXPos, wingsYPos, wingsJumping.width, wingsJumping.height);
+    image(wingsJumping, wingsXPos, wingsYPos, wingsJumping.width * spriteScale, wingsJumping.height * spriteScale);
   }
   else if (wingsIsMovingLeft) {
-    image(wingsLeft, wingsXPos, wingsYPos, wingsLeft.width, wingsLeft.height);
+    image(wingsLeft, wingsXPos, wingsYPos, wingsLeft.width * spriteScale, wingsLeft.height * spriteScale);
   }
   else if (wingsIsMovingRight) {
-    image(wingsRight, wingsXPos, wingsYPos, wingsRight.width, wingsRight.height);
+    image(wingsRight, wingsXPos, wingsYPos, wingsRight.width * spriteScale, wingsRight.height * spriteScale);
   }
   else {
     image(wingsStanding, wingsXPos, wingsYPos, wingsStanding.width * spriteScale, wingsStanding.height * spriteScale);
@@ -247,11 +247,11 @@ function handleMovement() {
     wingsJumpHeight = 100;
   }
 
-  if (wingsIsMovingLeft && !wallOnBatsLeft) {
+  if (wingsIsMovingLeft && !wallOnWingsLeft) {
     wingsXPos -= movementSpeed;
   }
 
-  if (wingsIsMovingRight && !wallOnBatsRight) {
+  if (wingsIsMovingRight && !wallOnWingsRight) {
     wingsXPos += movementSpeed;
   }
 
@@ -350,7 +350,6 @@ function collisionDetection() {
     ceilingAboveWings = false;
   }
 
-  
   //Key and door check
 
   //Bats Sprite Collision
@@ -379,6 +378,7 @@ function collisionDetection() {
 }
 
 function levelPassed() {
+  state = "level Passed";
 
 }
 
