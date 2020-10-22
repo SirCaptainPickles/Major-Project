@@ -108,7 +108,7 @@ function setup() {
 }
 
 function draw() {
-  background(220);
+  background(225);
 
   if (state === "play") {
     whereTheSpritesAre();
@@ -122,9 +122,13 @@ function draw() {
   }
 
   if (state === "level Passed") {
-    background("Black");
+    background(0);
     levelPassedScreen();
-    
+  }
+
+  if (state === "level Failed") {
+    background(0);
+    levelFailedScreen();
   }
 }
 
@@ -251,10 +255,6 @@ function handleMovement() {
       }
     }
 
-    if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "!") {
-      levelFailedScreen();
-    }
-
     //Sprite Wings Movement
     if (ceilingAboveWings) {
       wingsJumpHeight = 30;
@@ -278,10 +278,6 @@ function handleMovement() {
       else {
         wingsIsJumping = false;
       }
-    }
-
-    if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "!") {
-      levelFailedScreen();
     }
   }
 }
@@ -323,6 +319,13 @@ function applyGravity() {
 }
 
 function collisionDetection() {
+  if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "!") {
+    state = "level Failed";
+  }
+  if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "!") {
+    state = "level Failed";
+  }
+
   //Wall and ceilling check
 
   //Bats Sprite Collision
@@ -400,13 +403,18 @@ function loadNextLevel() {
   levelCounter++;
 
   if (levelCounter === 2) {
+    batsXPos = 100;
+    batsYPos = 100;
+    wingsXPos = 300;
+    wingsYPos = 300;
+
     currentLevel = levelTwo;
   }
 
   else {
     endGame();
   }
-  
+
   // convert currentLevel into 2d array
   for (let i=0; i<currentLevel.length; i++) {
     currentLevel[i] = currentLevel[i].split(" ");
@@ -429,15 +437,23 @@ function levelPassedScreen() {
 }
 
 function levelFailedScreen() {
+  fill(255);
+  textSize(60);
+  textAlign(CENTER, CENTER);
+  text("Whoopsie, looks like you slipped up", width / 2, height / 4);
 
+
+  textSize(50);
+  textAlign(LEFT, TOP);
+  text("Try Again", width * 0.6, height * 0.7);
+  if (mouseX > width * 0.6 && mouseX < width * 0.8 && mouseY > height * 0.7 && mouseY < height * 0.8 && mouseIsPressed){
+    state = "play";
+  }
 }
 
 function endGame() {
   state = "game Ended";
-  //   background(0);
-//   fill(255);
-//     textSize(35);
-//     text("Whoopsie, looks like you slipped up", width / 2, height / 2, width/4, height/2);
+
 }
 
 function displayLevel() {
