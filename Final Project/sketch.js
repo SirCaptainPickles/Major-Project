@@ -8,8 +8,12 @@
 // Variable used to change between screens/gamestates, and locations
 let state = "play";
 
+//Level Arrays
+let levelOne = [];
+let levelTwo = [];
+
 //Game setup Variables
-let currentLevel = [];
+let currentLevel;
 const LEVELWIDTH = 40;
 const LEVELHEIGHT = 20;
 let cellSize;
@@ -67,7 +71,8 @@ let movementSpeed = 7;
 
 // Loads all Images and first level
 function preload() {
-  currentLevel = loadStrings("assets/level1.txt");
+  levelOne = loadStrings("assets/level1.txt");
+  levelTwo = loadStrings("assets/level2.txt");
 
   //Sprite Bats images
   batsStanding = loadImage("assets/characters/bats-standing.png");
@@ -84,6 +89,9 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  frameRate(30);
+
+  currentLevel = levelOne;
 
   if (height > width) {
     cellSize = windowWidth / LEVELWIDTH;
@@ -91,8 +99,6 @@ function setup() {
   else {
     cellSize = windowHeight / LEVELHEIGHT;
   }
-
-  frameRate(30);
 
   // convert currentLevel into 2d array
   for (let i=0; i<currentLevel.length; i++) {
@@ -121,8 +127,6 @@ function draw() {
     
   }
 }
-
-
 
 function mousePressed() { //REMOVE AFTER DEBUGGING
   console.log(currentLevel);
@@ -395,17 +399,17 @@ function collisionDetection() {
 function loadNextLevel() {
   levelCounter++;
 
-  if (levelCounter <= 2) {
-    currentLevel = loadStrings("assets/level" + levelCounter + ".txt");
-
-    // convert currentLevel into 2d array
-    for (let i=0; i<currentLevel.length; i++) {
-      currentLevel[i] = currentLevel[i].split(" ");
-    }
+  if (levelCounter === 2) {
+    currentLevel = levelTwo;
   }
 
   else {
     endGame();
+  }
+  
+  // convert currentLevel into 2d array
+  for (let i=0; i<currentLevel.length; i++) {
+    currentLevel[i] = currentLevel[i].split(" ");
   }
 }
 
@@ -430,6 +434,10 @@ function levelFailedScreen() {
 
 function endGame() {
   state = "game Ended";
+  //   background(0);
+//   fill(255);
+//     textSize(35);
+//     text("Whoopsie, looks like you slipped up", width / 2, height / 2, width/4, height/2);
 }
 
 function displayLevel() {
@@ -466,11 +474,3 @@ function displayLevel() {
     }
   }   
 }
-
-// function deathScreen() {
-//   clear();
-//   background(0);
-//   fill(255);
-//     textSize(35);
-//     text("Whoopsie, looks like you slipped up", width / 2, height / 2, width/4, height/2);
-// }
