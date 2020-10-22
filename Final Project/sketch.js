@@ -6,7 +6,7 @@
 // 
 
 // Variable used to change between screens/gamestates, and locations
-let state = "start menu";
+let state = "play";
 
 //Game setup Variables
 let currentLevel = [];
@@ -17,6 +17,7 @@ let cellSize;
 let hasKey = false;
 let levelCompleted = false;
 let hit = false;
+let levelCounter = 1;
 
 //Setting Sprite Position Variables
 let batsStanding, batsRight, batsLeft, batsJumping;
@@ -103,15 +104,25 @@ function setup() {
 function draw() {
   background(220);
 
-  whereTheSpritesAre();
-  displayLevel();
+  if (state === "play") {
+    whereTheSpritesAre();
+    displayLevel();
 
-  displaySpriteBats();
-  displaySpriteWings();
+    displaySpriteBats();
+    displaySpriteWings();
 
-  handleMovement();
-  applyGravity();
+    handleMovement();
+    applyGravity();
+  }
+
+  if (state === "level Passed") {
+    background("Black");
+    levelPassedScreen();
+    
+  }
 }
+
+
 
 function mousePressed() { //REMOVE AFTER DEBUGGING
   console.log(currentLevel);
@@ -178,7 +189,7 @@ function keyPressed() {
   if (keyCode === RIGHT_ARROW) {
     wingsIsMovingRight = true;
   }
-  if (keyCode === UP_ARROW) {
+  if (keyCode === UP_ARROW && wingsIsGrounded) {
     wingsInitialY = wingsYPos;
     wingsIsJumping = true;
   }
@@ -210,96 +221,100 @@ function handleMovement() {
   //Check for Collision before Moving
   collisionDetection();
 
-  //Sprite Bats movement
-  if (ceilingAboveBats) {
-    batsJumpHeight = 30;
-  }
-  else {
-    batsJumpHeight = 70;
-  }
-
-  if (batsIsMovingLeft && !wallOnBatsLeft) {
-    batsXPos -= movementSpeed;
-  }
-
-  if (batsIsMovingRight && !wallOnBatsRight) {
-    batsXPos += movementSpeed;
-  }
-
-  if (batsIsJumping) {
-    if (batsYPos >= batsInitialY - batsJumpHeight) {
-      batsYPos -= jumpSpeed;
+  if (state === "play") {
+    //Sprite Bats movement
+    if (ceilingAboveBats) {
+      batsJumpHeight = 30;
     }
     else {
-      batsIsJumping = false;
+      batsJumpHeight = 70;
     }
-  }
 
-  if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "!") {
-    levelFailedScreen();
-  }
+    if (batsIsMovingLeft && !wallOnBatsLeft) {
+      batsXPos -= movementSpeed;
+    }
 
-  //Sprite Wings Movement
-  if (ceilingAboveWings) {
-    wingsJumpHeight = 30;
-  }
-  else {
-    wingsJumpHeight = 100;
-  }
+    if (batsIsMovingRight && !wallOnBatsRight) {
+      batsXPos += movementSpeed;
+    }
 
-  if (wingsIsMovingLeft && !wallOnWingsLeft) {
-    wingsXPos -= movementSpeed;
-  }
+    if (batsIsJumping) {
+      if (batsYPos >= batsInitialY - batsJumpHeight) {
+        batsYPos -= jumpSpeed;
+      }
+      else {
+        batsIsJumping = false;
+      }
+    }
 
-  if (wingsIsMovingRight && !wallOnWingsRight) {
-    wingsXPos += movementSpeed;
-  }
+    if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "!") {
+      levelFailedScreen();
+    }
 
-  if (wingsIsJumping) {
-    if (wingsYPos >= wingsInitialY - wingsJumpHeight) {
-      wingsYPos -= jumpSpeed;
+    //Sprite Wings Movement
+    if (ceilingAboveWings) {
+      wingsJumpHeight = 30;
     }
     else {
-      wingsIsJumping = false;
+      wingsJumpHeight = 100;
     }
-  }
 
-  if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "!") {
-    levelFailedScreen();
+    if (wingsIsMovingLeft && !wallOnWingsLeft) {
+      wingsXPos -= movementSpeed;
+    }
+
+    if (wingsIsMovingRight && !wallOnWingsRight) {
+      wingsXPos += movementSpeed;
+    }
+
+    if (wingsIsJumping) {
+      if (wingsYPos >= wingsInitialY - wingsJumpHeight) {
+        wingsYPos -= jumpSpeed;
+      }
+      else {
+        wingsIsJumping = false;
+      }
+    }
+
+    if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "!") {
+      levelFailedScreen();
+    }
   }
 }
 
 function applyGravity() {
-  //Setting temporary variables to help with floor collision
-  let tempBatsYPosOnGrid = round((batsYPos + 5) / cellSize);
-  let tempBatsXPosOnGrid = floor(batsXPos / cellSize);
-  let tempWingsYPosOnGrid = round((wingsYPos + 5) / cellSize);
-  let tempWingsXPosOnGrid = floor(wingsXPos / cellSize);
+  if (state === "play") {
+    //Setting temporary variables to help with floor collision
+    let tempBatsYPosOnGrid = round((batsYPos + 5) / cellSize);
+    let tempBatsXPosOnGrid = floor(batsXPos / cellSize);
+    let tempWingsYPosOnGrid = round((wingsYPos + 5) / cellSize);
+    let tempWingsXPosOnGrid = floor(wingsXPos / cellSize);
 
-  // Ground Detection for Sprite Bats
-  if (currentLevel[tempBatsYPosOnGrid][tempBatsXPosOnGrid] === "+") {
-    batsIsGrounded = true;
-  }
-  else {
-    batsIsGrounded = false;
-  }
-  
-  //Apply gravity to Sprite Bats
-  if (!batsIsGrounded && !batsIsJumping) {
-    batsYPos += gravity;
-  }
-  
-  //Ground Detection for Sprite Wings
-  if (currentLevel[tempWingsYPosOnGrid][tempWingsXPosOnGrid] === "+") {
-    wingsIsGrounded = true;
-  }
-  else {
-    wingsIsGrounded = false;
-  }
-  
-  //Apply Gravity to Sprite Wings
-  if (!wingsIsGrounded && !wingsIsJumping) {
-    wingsYPos += gravity;
+    // Ground Detection for Sprite Bats
+    if (currentLevel[tempBatsYPosOnGrid][tempBatsXPosOnGrid] === "+") {
+      batsIsGrounded = true;
+    }
+    else {
+      batsIsGrounded = false;
+    }
+    
+    //Apply gravity to Sprite Bats
+    if (!batsIsGrounded && !batsIsJumping) {
+      batsYPos += gravity;
+    }
+    
+    //Ground Detection for Sprite Wings
+    if (currentLevel[tempWingsYPosOnGrid][tempWingsXPosOnGrid] === "+") {
+      wingsIsGrounded = true;
+    }
+    else {
+      wingsIsGrounded = false;
+    }
+    
+    //Apply Gravity to Sprite Wings
+    if (!wingsIsGrounded && !wingsIsJumping) {
+      wingsYPos += gravity;
+    }
   }
 }
 
@@ -360,8 +375,8 @@ function collisionDetection() {
   }
 
   if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "?" && hasKey) {
-    levelCompleted = true;
-    levelPassed();
+    state = "level Passed";
+    loadNextLevel();
   }
 
   //Wings Sprite Collision
@@ -372,18 +387,49 @@ function collisionDetection() {
   }
 
   if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "?" && hasKey) {
-    levelCompleted = true;
-    levelPassed();
+    state = "level Passed";
+    loadNextLevel();
   }
 }
 
-function levelPassed() {
-  state = "level Passed";
+function loadNextLevel() {
+  levelCounter++;
 
+  if (levelCounter <= 2) {
+    currentLevel = loadStrings("assets/level" + levelCounter + ".txt");
+
+    // convert currentLevel into 2d array
+    for (let i=0; i<currentLevel.length; i++) {
+      currentLevel[i] = currentLevel[i].split(" ");
+    }
+  }
+
+  else {
+    endGame();
+  }
+}
+
+function levelPassedScreen() {
+  textAlign(CENTER, CENTER);
+  textSize(60);
+  fill("white");
+  text("Congrats!", width / 2, height / 4);
+  text("Level " + levelCounter + " Passed!", width /2, height / 3);
+
+  textSize(50);
+  textAlign(LEFT, TOP);
+  text("Play Next Level", width * 0.6, height * 0.7);
+  if (mouseX > width * 0.6 && mouseX < width * 0.8 && mouseY > height * 0.7 && mouseY < height * 0.8 && mouseIsPressed){
+    state = "play";
+  }
 }
 
 function levelFailedScreen() {
 
+}
+
+function endGame() {
+  state = "game Ended";
 }
 
 function displayLevel() {
