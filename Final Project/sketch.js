@@ -32,6 +32,7 @@ let wingsStanding, wingsRight, wingsLeft, wingsJumping;
 let wingsXPos = 410;
 let wingsYPos = 200;
 
+
 //Setting Sprite Movement Variables
 let batsIsMovingLeft = false;
 let batsIsMovingRight = false; 
@@ -108,9 +109,9 @@ function setup() {
 }
 
 function draw() {
-  background(225);
-
+  
   if (state === "play") {
+    background(225);
     whereTheSpritesAre();
     displayLevel();
 
@@ -442,11 +443,19 @@ function levelFailedScreen() {
   textAlign(CENTER, CENTER);
   text("Whoopsie, looks like you slipped up", width / 2, height / 4);
 
+  if (currentLevel === levelOne) {
+    wingsXPos = 410;
+    wingsYPos = 200;
+    batsXPos = 400;
+    batsYPos = 200;
+  }
+
 
   textSize(50);
   textAlign(LEFT, TOP);
   text("Try Again", width * 0.6, height * 0.7);
   if (mouseX > width * 0.6 && mouseX < width * 0.8 && mouseY > height * 0.7 && mouseY < height * 0.8 && mouseIsPressed){
+    console.log("State is now play");
     state = "play";
   }
 }
