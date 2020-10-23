@@ -25,7 +25,7 @@ let levelCounter = 1;
 
 //Setting Sprite Position Variables
 let batsStanding, batsRight, batsLeft, batsJumping;
-let batsXPos = 400;
+let batsXPos = 100;
 let batsYPos = 200;
 
 let wingsStanding, wingsRight, wingsLeft, wingsJumping;
@@ -44,22 +44,6 @@ let wingsIsMovingRight = false;
 let wingsIsJumping = false;
 let wingsYPositionOnGrid, wingsXPositionOnGrid;
 
-
-// Sprite managment (Scaling and collision)
-let hitboxScale = 20;
-let spriteScale = 1.4;
-
-// Sprite Movement Variables
-let batsIsGrounded = false;
-let wallOnBatsRight = false;
-let wallOnBatsLeft = false;
-let ceilingAboveBats = false;
-
-let wingsIsGrounded = false;
-let wallOnWingsRight = false;
-let wallOnWingsLeft = false;
-let ceilingAboveWings = false;
-
 let batsInitialY, wingsInitialY;
 
 let batsJumpHeight = 70;
@@ -69,6 +53,30 @@ let jumpSpeed = 5;
 let gravity = 5;
 let movementSpeed = 7;
 
+// Sprite managment (Scaling and collision)
+let hitboxScale = 20;
+let spriteScale = 1.4;
+
+// Sprite Collision Variables
+let batsIsGrounded = false;
+let wallOnBatsRight = false;
+let wallOnBatsLeft = false;
+let ceilingAboveBats = false;
+
+let wingsOnRight = false;
+let wingsOnLeft = false;
+let wingsBelow = false;
+let wingsAbove = false;
+
+let wingsIsGrounded = false;
+let wallOnWingsRight = false;
+let wallOnWingsLeft = false;
+let ceilingAboveWings = false;
+
+let batsOnRight = false;
+let batsOnLeft = false;
+let batsBelow = false;
+let batsAbove = false;
 
 // Loads all Images and first level
 function preload() {
@@ -229,6 +237,7 @@ function keyReleased() {
 function handleMovement() {
   //Check for Collision before Moving
   collisionDetection();
+  characterCollision();
 
   if (state === "play") {
     //Sprite Bats movement
@@ -239,11 +248,11 @@ function handleMovement() {
       batsJumpHeight = 70;
     }
 
-    if (batsIsMovingLeft && !wallOnBatsLeft) {
+    if (batsIsMovingLeft && !wallOnBatsLeft && !wingsOnLeft) {
       batsXPos -= movementSpeed;
     }
 
-    if (batsIsMovingRight && !wallOnBatsRight) {
+    if (batsIsMovingRight && !wallOnBatsRight && !wingsOnRight) {
       batsXPos += movementSpeed;
     }
 
@@ -292,7 +301,7 @@ function applyGravity() {
     let tempWingsXPosOnGrid = floor(wingsXPos / cellSize);
 
     // Ground Detection for Sprite Bats
-    if (currentLevel[tempBatsYPosOnGrid][tempBatsXPosOnGrid] === "+") {
+    if (currentLevel[tempBatsYPosOnGrid][tempBatsXPosOnGrid] === "+" || wingsBelow) {
       batsIsGrounded = true;
     }
     else {
@@ -305,7 +314,7 @@ function applyGravity() {
     }
     
     //Ground Detection for Sprite Wings
-    if (currentLevel[tempWingsYPosOnGrid][tempWingsXPosOnGrid] === "+") {
+    if (currentLevel[tempWingsYPosOnGrid][tempWingsXPosOnGrid] === "+" || batsBelow) {
       wingsIsGrounded = true;
     }
     else {
@@ -400,6 +409,50 @@ function collisionDetection() {
   }
 }
 
+function characterCollision() {
+  let halfOfWingsWidth = wingsStanding.width * spriteScale / 2;
+  let halfOfWingsHeight = wingsStanding.height * spriteScale / 2;
+
+  let halfOfBatsWidth = batsStanding.width /2;
+  let halfOfBatsHeight = batsStanding.height /2;
+
+  // //Sprite Bats running into Sprite Wings
+  // if (batsXPos >= wingsXPos - wingsXAndWidth && batsXPos < wingsXPos + wingsXAndWidth && 
+  //   batsYPos <= wingsYPos + wingsXAndHeight && batsYPos >= wingsYPos - wingsXAndHeight) {
+
+  //   wingsOnRight = true;
+  // }
+  // else {
+  //   wingsOnRight = false;
+  // }
+
+  // if (batsXPos <= wingsXPos + wingsXAndWidth && batsXPos > wingsXPos + wingsXAndWidth && 
+  //   batsYPos <= wingsYPos + wingsXAndHeight && batsYPos >= wingsYPos - wingsXAndHeight) {
+
+  //   wingsOnLeft = true;
+  // }
+  // else {
+  //   wingsOnLeft = false;
+  // }
+
+  if (batsYPos <= wingsYPos + halfOfWingsHeight && batsYPos > wingsYPos - 50 && batsXPos >= wingsXPos -halfOfWingsWidth && batsXPos <= wingsXPos + halfOfWingsWidth) {
+    wingsBelow = true;
+  }
+
+  else {
+    wingsBelow = false;
+  }
+
+  if (wingsYPos <= batsYPos + halfOfBatsHeight && wingsYPos > batsYPos - 50 && wingsXPos >= batsXPos -halfOfBatsWidth && wingsXPos <= batsXPos + halfOfBatsWidth) {
+    batsBelow = true;
+  }
+
+  else {
+    batsBelow = false;
+  }
+
+}
+
 function loadNextLevel() {
   levelCounter++;
 
@@ -446,10 +499,9 @@ function levelFailedScreen() {
   if (currentLevel === levelOne) {
     wingsXPos = 410;
     wingsYPos = 200;
-    batsXPos = 400;
+    batsXPos = 100;
     batsYPos = 200;
   }
-
 
   textSize(50);
   textAlign(LEFT, TOP);
