@@ -329,10 +329,10 @@ function applyGravity() {
 }
 
 function collisionDetection() {
-  if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "!") {
+  if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "!" || currentLevel[batsYPositionOnGrid][batsXPositionOnGrid - 1] === "!") {
     state = "level Failed";
   }
-  if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "!") {
+  if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "!" || currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid - 1] === "!") {
     state = "level Failed";
   }
 
