@@ -256,7 +256,7 @@ function handleMovement() {
       batsXPos += movementSpeed;
     }
 
-    if (batsIsJumping) {
+    if (batsIsJumping && !wingsAbove) {
       if (batsYPos >= batsInitialY - batsJumpHeight) {
         batsYPos -= jumpSpeed;
       }
@@ -273,15 +273,15 @@ function handleMovement() {
       wingsJumpHeight = 100;
     }
 
-    if (wingsIsMovingLeft && !wallOnWingsLeft) {
+    if (wingsIsMovingLeft && !wallOnWingsLeft && !batsOnLeft) {
       wingsXPos -= movementSpeed;
     }
 
-    if (wingsIsMovingRight && !wallOnWingsRight) {
+    if (wingsIsMovingRight && !wallOnWingsRight && !batsOnRight) {
       wingsXPos += movementSpeed;
     }
 
-    if (wingsIsJumping) {
+    if (wingsIsJumping && !batsAbove) {
       if (wingsYPos >= wingsInitialY - wingsJumpHeight) {
         wingsYPos -= jumpSpeed;
       }
@@ -416,39 +416,67 @@ function characterCollision() {
   let halfOfBatsWidth = batsStanding.width /2;
   let halfOfBatsHeight = batsStanding.height /2;
 
-  // //Sprite Bats running into Sprite Wings
-  // if (batsXPos >= wingsXPos - wingsXAndWidth && batsXPos < wingsXPos + wingsXAndWidth && 
-  //   batsYPos <= wingsYPos + wingsXAndHeight && batsYPos >= wingsYPos - wingsXAndHeight) {
+  //Sprite Bats running into Sprite Wings
+  //Sprite wings is on right side
+  if (batsXPos >= wingsXPos - 30 && batsXPos < wingsXPos + halfOfWingsWidth && 
+    batsYPos <= wingsYPos + halfOfWingsHeight && batsYPos >= wingsYPos - halfOfWingsHeight) {
 
-  //   wingsOnRight = true;
-  // }
-  // else {
-  //   wingsOnRight = false;
-  // }
+    wingsOnRight = true;
+  }
+  else {
+    wingsOnRight = false;
+  }
 
-  // if (batsXPos <= wingsXPos + wingsXAndWidth && batsXPos > wingsXPos + wingsXAndWidth && 
-  //   batsYPos <= wingsYPos + wingsXAndHeight && batsYPos >= wingsYPos - wingsXAndHeight) {
+  //Sprite wings is on left side
+  if (batsXPos <= wingsXPos + 30 && batsXPos > wingsXPos + halfOfWingsWidth && 
+     batsYPos <= wingsYPos + halfOfWingsHeight && batsYPos >= wingsYPos - halfOfWingsHeight) {
 
-  //   wingsOnLeft = true;
-  // }
-  // else {
-  //   wingsOnLeft = false;
-  // }
+    wingsOnLeft = true;
+  }
+  else {
+    wingsOnLeft = false;
+  }
 
+  //Sprite wings is below
   if (batsYPos <= wingsYPos + halfOfWingsHeight && batsYPos > wingsYPos - 50 && batsXPos >= wingsXPos -halfOfWingsWidth && batsXPos <= wingsXPos + halfOfWingsWidth) {
     wingsBelow = true;
+    batsAbove = true;
   }
 
   else {
     wingsBelow = false;
+    batsAbove = false;
   }
 
+  //Sprite Wings running into Sprite Bats
+  //Sprite Bats is on right side
+  if (wingsXPos >= batsXPos - 30 && wingsXPos < batsXPos + halfOfBatsWidth && 
+    wingsYPos <= batsYPos + halfOfBatsHeight && wingsYPos >= batsYPos - halfOfBatsHeight) {
+
+    batsOnRight = true;
+  }
+  else {
+    batsOnRight = false;
+  }
+
+  //Sprite Bats is on left side
+  if (wingsXPos <= batsXPos + 30 && wingsXPos > batsXPos + halfOfBatsWidth && 
+    wingsYPos <= batsYPos + halfOfBatsHeight && wingsYPos >= batsYPos - halfOfBatsHeight) {
+
+    batsOnLeft = true;
+  }
+  else {
+    batsOnLeft = false;
+  }
+
+  //Sprite Bats is Below
   if (wingsYPos <= batsYPos + halfOfBatsHeight && wingsYPos > batsYPos - 50 && wingsXPos >= batsXPos -halfOfBatsWidth && wingsXPos <= batsXPos + halfOfBatsWidth) {
     batsBelow = true;
+    wingsAbove = true;
   }
-
   else {
     batsBelow = false;
+    wingsAbove = false;
   }
 
 }
