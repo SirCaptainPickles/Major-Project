@@ -1,0 +1,9 @@
+# Reflection
+
+The most challenging part of my project was the collision. Having the free moving characters interect with 2D array grid was difficult because I had to convert the X and Y positions into places on the grid. But this meant that where the characters are on the grid isn't acurate to the actual position. This meant that I had to calculate collision differently depending on what the characters are hitting so that they don't stop too soon or too late.
+
+I think I'm most proud of my character collision - that is the character's hitting eachother. Without this mechanic the game is just a platformer, but giving them the ability to jump on eachother led to a more puzzle feeling game. It was also rather hard to code it so they could jump ontop of eachother because of the way the jump mechanic is applied. I had to make it so when a character is ontop of another the character below's head counted as ground. I also had to make it so if there was a character ontop that the one below couldn't jump or they would be able to get stuck inside eachother and then jump out of the map.
+
+I had the most fun with the actual level building. Being able to change a few things and see the blocks alter in real time was cool, and it also put my puzzle making skills to the test.
+
+If I had more time I'd change the visuals a bit so that everything looked cleaner. The sprites that are used right now were created by me so they don't look very good. I'd also use images instead of coloured blocks and an image of a key for the key.
