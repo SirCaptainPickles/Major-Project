@@ -6,4 +6,4 @@ I think I'm most proud of my character collision - that is the character's hitti
 
 I had the most fun with the actual level building. Being able to change a few things and see the blocks alter in real time was cool, and it also put my puzzle making skills to the test.
 
-If I had more time I'd change the visuals a bit so that everything looked cleaner. The sprites that are used right now were created by me so they don't look very good. I'd also use images instead of coloured blocks and an image of a key for the key.
+If I had more time I'd change the visuals a bit so that everything looked cleaner. The sprites that are used right now were created by me so they don't look very good. I'd also use images instead of coloured blocks and an image of a key for the key and a door for the door. I'd also be sure to add a start menu with similar graphics.
