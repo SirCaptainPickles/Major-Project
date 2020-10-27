@@ -486,9 +486,9 @@ function loadNextLevel() {
 
   if (levelCounter === 2) {
     batsXPos = 100;
-    batsYPos = 100;
-    wingsXPos = 300;
-    wingsYPos = 300;
+    batsYPos = 700;
+    wingsXPos = 150;
+    wingsYPos = 700;
 
     currentLevel = levelTwo;
   }
@@ -525,6 +525,13 @@ function levelFailedScreen() {
   text("Whoopsie, looks like you slipped up", width / 2, height / 4);
 
   if (currentLevel === levelOne) {
+    wingsXPos = 410;
+    wingsYPos = 200;
+    batsXPos = 100;
+    batsYPos = 200;
+  }
+
+  if (currentLevel === levelTwo) {
     wingsXPos = 410;
     wingsYPos = 200;
     batsXPos = 100;
