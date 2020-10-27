@@ -1,0 +1,5 @@
+# Reflection
+
+The most challenging part of my project was the collision. Having the free moving characters interect with 2D array grid was difficult because I had to convert the X and Y positions into places on the grid. But this meant that where the characters are on the grid isn't acurate to the actual position. This meant that I had to calculate collision differently depending on what the characters are hitting so that they don't stop too soon or too late.
+
+I think I'm most proud of my character collision - that is the character's hitting eachother. Without this mechanic the game is just a platformer, but giving them the ability to jump on eachother lead to a more puzzle feeling game. It was also rather hard to code

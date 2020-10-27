@@ -1,9 +1,6 @@
 // Puzzles and whateverssss
 // Heather Grove 
 // Oct 9, 2020
-//
-// Extra for Experts:
-// 
 
 // Variable used to change between screens/gamestates, and locations
 let state = "play";
@@ -54,7 +51,7 @@ let gravity = 5;
 let movementSpeed = 7;
 
 // Sprite managment (Scaling and collision)
-let hitboxScale = 20;
+let hitbox = 30;
 let spriteScale = 1.4;
 
 // Sprite Collision Variables
@@ -102,6 +99,7 @@ function setup() {
 
   currentLevel = levelOne;
 
+  //Setting cellSize based on window size
   if (height > width) {
     cellSize = windowWidth / LEVELWIDTH;
   }
@@ -139,24 +137,29 @@ function draw() {
     background(0);
     levelFailedScreen();
   }
-}
 
-function mousePressed() { //REMOVE AFTER DEBUGGING
-  console.log(currentLevel);
+  if (state === "game Ended") {
+    background(0);
+    gameEndedScreen();
+  }
 }
 
 function displaySpriteBats() {
   imageMode(CENTER);
 
+  //Display jumping image if jumping
   if (batsIsJumping) {
     image(batsJumping, batsXPos, batsYPos, batsJumping.width, batsJumping.height);
   }
+  //Display moving left if moving left
   else if (batsIsMovingLeft) {
     image(batsLeft, batsXPos, batsYPos, batsLeft.width, batsLeft.height);
   }
+  //Display moving right if moving Right
   else if (batsIsMovingRight) {
     image(batsRight, batsXPos, batsYPos, batsRight.width, batsRight.height);
   }
+  //Else display standing
   else {
     image(batsStanding, batsXPos, batsYPos, batsStanding.width, batsStanding.height);
   }
@@ -164,31 +167,36 @@ function displaySpriteBats() {
 
 function displaySpriteWings() {
   imageMode(CENTER);
-
+  //Display jumping image if jumping
   if (wingsIsJumping) {
     image(wingsJumping, wingsXPos, wingsYPos, wingsJumping.width * spriteScale, wingsJumping.height * spriteScale);
   }
+  //Display moving left if moving left
   else if (wingsIsMovingLeft) {
     image(wingsLeft, wingsXPos, wingsYPos, wingsLeft.width * spriteScale, wingsLeft.height * spriteScale);
   }
+  //Display moving right if moving Right
   else if (wingsIsMovingRight) {
     image(wingsRight, wingsXPos, wingsYPos, wingsRight.width * spriteScale, wingsRight.height * spriteScale);
   }
+  //Else display standing
   else {
     image(wingsStanding, wingsXPos, wingsYPos, wingsStanding.width * spriteScale, wingsStanding.height * spriteScale);
   }
 }
 
 function whereTheSpritesAre() {
+  //Find Sprite bats' position on the grid
   batsYPositionOnGrid = round(batsYPos / cellSize);
   batsXPositionOnGrid = round(batsXPos / cellSize);
 
+  //Find Sprite wings' position on the grid
   wingsYPositionOnGrid = round(wingsYPos / cellSize);
   wingsXPositionOnGrid = round(wingsXPos / cellSize);
 }
 
 function keyPressed() {
-
+  //Bats movement
   if (key === "a") {
     batsIsMovingLeft = true;
   }
@@ -200,6 +208,7 @@ function keyPressed() {
     batsIsJumping = true;
   }
 
+  //Wings movement
   if (keyCode === LEFT_ARROW) {
     wingsIsMovingLeft = true;
   }
@@ -213,6 +222,7 @@ function keyPressed() {
 }
 
 function keyReleased() {
+  //Bats movement
   if (key === "a") {
     batsIsMovingLeft = false;
   }
@@ -223,6 +233,7 @@ function keyReleased() {
     batsIsJumping = false;
   }
 
+  //wings movement
   if (keyCode === LEFT_ARROW) {
     wingsIsMovingLeft = false;
   }
@@ -241,6 +252,7 @@ function handleMovement() {
 
   if (state === "play") {
     //Sprite Bats movement
+    //Reduce jump height to prevent jumping through ceiling
     if (ceilingAboveBats) {
       batsJumpHeight = 30;
     }
@@ -248,14 +260,17 @@ function handleMovement() {
       batsJumpHeight = 70;
     }
 
+    //Move left
     if (batsIsMovingLeft && !wallOnBatsLeft && !wingsOnLeft) {
       batsXPos -= movementSpeed;
     }
 
+    //Move right
     if (batsIsMovingRight && !wallOnBatsRight && !wingsOnRight) {
       batsXPos += movementSpeed;
     }
 
+    //Jump
     if (batsIsJumping && !wingsAbove) {
       if (batsYPos >= batsInitialY - batsJumpHeight) {
         batsYPos -= jumpSpeed;
@@ -266,6 +281,7 @@ function handleMovement() {
     }
 
     //Sprite Wings Movement
+    //Reduce jump height to prevent jumping through ceiling
     if (ceilingAboveWings) {
       wingsJumpHeight = 30;
     }
@@ -273,14 +289,17 @@ function handleMovement() {
       wingsJumpHeight = 100;
     }
 
+    //Move left
     if (wingsIsMovingLeft && !wallOnWingsLeft && !batsOnLeft) {
       wingsXPos -= movementSpeed;
     }
 
+    //Move Right
     if (wingsIsMovingRight && !wallOnWingsRight && !batsOnRight) {
       wingsXPos += movementSpeed;
     }
 
+    //Jump
     if (wingsIsJumping && !batsAbove) {
       if (wingsYPos >= wingsInitialY - wingsJumpHeight) {
         wingsYPos -= jumpSpeed;
@@ -329,6 +348,7 @@ function applyGravity() {
 }
 
 function collisionDetection() {
+  //Collision with danger check
   if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "!" || currentLevel[batsYPositionOnGrid][batsXPositionOnGrid - 1] === "!") {
     state = "level Failed";
   }
@@ -339,6 +359,7 @@ function collisionDetection() {
   //Wall and ceilling check
 
   //Bats Sprite Collision
+  //Wall on left
   if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid - 1] === "+") {
     wallOnBatsLeft = true;
   }
@@ -346,6 +367,7 @@ function collisionDetection() {
     wallOnBatsLeft = false;
   }
 
+  //wall on right
   if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "+") {
     wallOnBatsRight = true;
   }
@@ -353,6 +375,7 @@ function collisionDetection() {
     wallOnBatsRight = false;
   }
 
+  //Ceiling above
   if (currentLevel[batsYPositionOnGrid - 1][batsXPositionOnGrid] === "+") {
     ceilingAboveBats = true;
   }
@@ -361,6 +384,7 @@ function collisionDetection() {
   }
 
   //Wings Sprite Collision
+  //Wall on left
   if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid - 1] === "+") {
     wallOnWingsLeft = true;
   }
@@ -368,6 +392,7 @@ function collisionDetection() {
     wallOnWingsLeft = false;
   }
 
+  //Wall on right
   if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "+") {
     wallOnWingsRight = true;
   }
@@ -375,6 +400,7 @@ function collisionDetection() {
     wallOnWingsRight = false;
   }
 
+  //Ceiling above
   if (currentLevel[wingsYPositionOnGrid - 1][wingsXPositionOnGrid] === "+") {
     ceilingAboveWings = true;
   }
@@ -385,24 +411,28 @@ function collisionDetection() {
   //Key and door check
 
   //Bats Sprite Collision
+  //Key check
   if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "*") {
     console.log("Key collected");
     hasKey = true;
     currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] = "0";
   }
 
+  //Door check
   if (currentLevel[batsYPositionOnGrid][batsXPositionOnGrid] === "?" && hasKey) {
     state = "level Passed";
     loadNextLevel();
   }
 
   //Wings Sprite Collision
+  //Key check
   if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "*") {
     console.log("Key collected");
     hasKey = true;
     currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] = "0";
   }
 
+  //Door check
   if (currentLevel[wingsYPositionOnGrid][wingsXPositionOnGrid] === "?" && hasKey) {
     state = "level Passed";
     loadNextLevel();
@@ -410,6 +440,7 @@ function collisionDetection() {
 }
 
 function characterCollision() {
+  //Setting alternate hitboxes
   let halfOfWingsWidth = wingsStanding.width * spriteScale / 2;
   let halfOfWingsHeight = wingsStanding.height * spriteScale / 2;
 
@@ -418,7 +449,7 @@ function characterCollision() {
 
   //Sprite Bats running into Sprite Wings
   //Sprite wings is on right side
-  if (batsXPos >= wingsXPos - 30 && batsXPos < wingsXPos + halfOfWingsWidth && 
+  if (batsXPos >= wingsXPos - hitbox && batsXPos < wingsXPos + halfOfWingsWidth && 
     batsYPos <= wingsYPos + halfOfWingsHeight && batsYPos >= wingsYPos - halfOfWingsHeight) {
 
     wingsOnRight = true;
@@ -428,7 +459,7 @@ function characterCollision() {
   }
 
   //Sprite wings is on left side
-  if (batsXPos <= wingsXPos + 30 && batsXPos > wingsXPos + halfOfWingsWidth && 
+  if (batsXPos <= wingsXPos + hitbox && batsXPos > wingsXPos + halfOfWingsWidth && 
      batsYPos <= wingsYPos + halfOfWingsHeight && batsYPos >= wingsYPos - halfOfWingsHeight) {
 
     wingsOnLeft = true;
@@ -450,7 +481,7 @@ function characterCollision() {
 
   //Sprite Wings running into Sprite Bats
   //Sprite Bats is on right side
-  if (wingsXPos >= batsXPos - 30 && wingsXPos < batsXPos + halfOfBatsWidth && 
+  if (wingsXPos >= batsXPos - hitbox && wingsXPos < batsXPos + halfOfBatsWidth && 
     wingsYPos <= batsYPos + halfOfBatsHeight && wingsYPos >= batsYPos - halfOfBatsHeight) {
 
     batsOnRight = true;
@@ -460,7 +491,7 @@ function characterCollision() {
   }
 
   //Sprite Bats is on left side
-  if (wingsXPos <= batsXPos + 30 && wingsXPos > batsXPos + halfOfBatsWidth && 
+  if (wingsXPos <= batsXPos + hitbox && wingsXPos > batsXPos + halfOfBatsWidth && 
     wingsYPos <= batsYPos + halfOfBatsHeight && wingsYPos >= batsYPos - halfOfBatsHeight) {
 
     batsOnLeft = true;
@@ -484,6 +515,7 @@ function characterCollision() {
 function loadNextLevel() {
   levelCounter++;
 
+  //Load level two
   if (levelCounter === 2) {
     batsXPos = 100;
     batsYPos = 700;
@@ -504,12 +536,14 @@ function loadNextLevel() {
 }
 
 function levelPassedScreen() {
+  //Congrats text
   textAlign(CENTER, CENTER);
   textSize(60);
   fill("white");
   text("Congrats!", width / 2, height / 4);
   text("Level " + levelCounter + " Passed!", width /2, height / 3);
 
+  //Next level text (Button)
   textSize(50);
   textAlign(LEFT, TOP);
   text("Play Next Level", width * 0.6, height * 0.7);
@@ -519,25 +553,32 @@ function levelPassedScreen() {
 }
 
 function levelFailedScreen() {
+  //Whoopsies text
   fill(255);
   textSize(60);
   textAlign(CENTER, CENTER);
   text("Whoopsie, looks like you slipped up", width / 2, height / 4);
 
+  //resetting levels
   if (currentLevel === levelOne) {
     wingsXPos = 410;
     wingsYPos = 200;
     batsXPos = 100;
     batsYPos = 200;
+
+    currentLevel = levelOne;
   }
 
   if (currentLevel === levelTwo) {
-    wingsXPos = 410;
-    wingsYPos = 200;
     batsXPos = 100;
-    batsYPos = 200;
+    batsYPos = 700;
+    wingsXPos = 150;
+    wingsYPos = 700;
+
+    currentLevel = levelTwo;
   }
 
+  //Try again text
   textSize(50);
   textAlign(LEFT, TOP);
   text("Try Again", width * 0.6, height * 0.7);
@@ -549,10 +590,18 @@ function levelFailedScreen() {
 
 function endGame() {
   state = "game Ended";
+}
 
+function gameEndedScreen() {
+  textSize(50);
+  textAlign(LEFT, TOP);
+  fill("white");
+  text("Thanks for playing!", width * 0.6, height * 0.7);
+  noLoop();
 }
 
 function displayLevel() {
+  //Displaying Grid
   for (let y=0; y < LEVELHEIGHT; y++) {
     for (let x=0; x < LEVELWIDTH; x++) {
     
